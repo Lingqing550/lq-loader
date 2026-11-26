@@ -36,6 +36,10 @@ public final class LqTweaker implements ITweaker {
 
     @Override
     public void injectIntoClassLoader(LaunchClassLoader classLoader) {
+        // 必须先于任何 org.lwjgl.* 类加载：否则客户端的 LWJGL 兼容层会留在父加载器，
+        // 和 LCC 里的 cn.stars.* 形成两份类，输入法组字串会写进另一份。
+        LwjglClassLoader.unify(classLoader);
+
         MixinEnvironment.getDefaultEnvironment().setSide(MixinEnvironment.Side.CLIENT);
         // JNA 从系统 classpath 加载，避免和游戏内的 JNA 出现两份
         classLoader.addClassLoaderExclusion("com.sun.jna.");
